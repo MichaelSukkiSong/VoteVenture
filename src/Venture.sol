@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 contract Venture {
-    uint256 public constant MINIMUM_FUND = 5;
+    uint256 public constant MINIMUM_FUND = 5 * 10 ** 18;
     address private immutable i_entrepreneur;
     address[] private funders;
     mapping(address funder => uint256 amount) private funderAmount;
@@ -24,7 +24,7 @@ contract Venture {
 
     function fund() public payable {
         if (msg.value < MINIMUM_FUND) {
-            revert("You need to send more than the minimum fund");
+            revert("You need to fund more than the minimum fund");
         }
 
         funders.push(msg.sender);
@@ -41,6 +41,11 @@ contract Venture {
         uint256 amount,
         address payable recipient
     ) public onlyEntrepreneur {
+        require(
+            amount < address(this).balance,
+            "Amount should be less than the total fund"
+        );
+
         Request storage newRequest = requests.push();
         newRequest.description = description;
         newRequest.amount = amount;
@@ -68,9 +73,9 @@ contract Venture {
         );
         require(!request.complete, "Request already completed");
 
-        (bool success, bytes memory data) = request.recipient.call{
-            value: request.amount
-        }("");
+        (bool success, ) = request.recipient.call{value: request.amount}("");
+
+        require(success, "Transfer failed");
 
         request.complete = true;
     }
