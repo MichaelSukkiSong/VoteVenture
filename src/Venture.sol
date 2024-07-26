@@ -80,7 +80,10 @@ contract Venture {
         request.complete = true;
     }
 
+    /****************** */
     /* getter functions */
+    /****************** */
+
     function getEntrepreneur() public view returns (address) {
         return i_entrepreneur;
     }
@@ -89,11 +92,29 @@ contract Venture {
         return funders;
     }
 
+    function getFunder(uint256 _index) public view returns (address) {
+        return funders[_index];
+    }
+
     function getFunderAmount(address _funder) public view returns (uint256) {
         return funderAmount[_funder];
     }
 
-    function getRequests() internal view returns (Request[] storage) {
-        return requests;
+    function getRequestCount() public view returns (uint256) {
+        return requests.length;
+    }
+
+    function getRequestDescription(
+        uint256 _index
+    ) public view returns (string memory) {
+        return requests[_index].description;
+    }
+
+    function getRequestAmount(uint256 _index) public view returns (uint256) {
+        return requests[_index].amount;
+    }
+
+    function getRequestRecipient(uint256 _index) public view returns (address) {
+        return requests[_index].recipient;
     }
 }
