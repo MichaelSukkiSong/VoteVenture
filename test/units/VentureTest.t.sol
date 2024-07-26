@@ -109,6 +109,24 @@ contract VentureTest is Test {
         );
     }
 
+    function test_RequestsDataStructureShouldBeUpdatedAfterCreation()
+        public
+        funded
+    {
+        vm.prank(venture.getEntrepreneur());
+        uint256 lengthBeforeRequestCreation = venture.getRequestCount();
+        venture.createRequest(
+            REQUEST_DESCRIPTION,
+            REQUEST_AMOUNT,
+            payable(RECIPIENT)
+        );
+
+        uint256 lengthAfterRequestCreation = venture.getRequestCount();
+
+        assertEq(lengthAfterRequestCreation - lengthBeforeRequestCreation, 1);
+    }
+
     /* approveRequest function */
+
     /* finalizeRequest function */
 }
