@@ -179,7 +179,7 @@ contract VentureTest is Test {
         assertEq(actualApprovalCount, 1);
     }
 
-    modifier approveRequest() {
+    modifier approvedRequest() {
         vm.prank(USER);
         venture.approveRequest(0);
 
@@ -187,4 +187,70 @@ contract VentureTest is Test {
     }
 
     /* finalizeRequest function */
+
+    modifier fundedWithAdditionalFunders(uint160 _additionalNumberOfFunders) {
+        for (uint160 i = 0; i < _additionalNumberOfFunders; i++) {
+            hoax(address(i), INITIAL_BALANCE);
+            venture.fund{value: FUND_AMOUNT}();
+        }
+
+        _;
+    }
+
+    function test_RevertIfApprovalCountIsLessThanHalfOfFunders()
+        public
+        funded
+        fundedWithAdditionalFunders(10)
+        createdRequest
+        approvedRequest
+    {
+        vm.prank(venture.getEntrepreneur());
+        vm.expectRevert();
+        venture.finalizeRequest(0);
+    }
+
+    function test_RevertIfRequestIsAlreadyCompleted()
+        public
+        funded
+        createdRequest
+        approvedRequest
+    {
+        vm.prank(venture.getEntrepreneur());
+        venture.finalizeRequest(0);
+
+        vm.prank(venture.getEntrepreneur());
+        vm.expectRevert();
+        venture.finalizeRequest(0);
+    }
+
+    function test_RequestIsSetToTrueAfterFinalization()
+        public
+        funded
+        createdRequest
+        approvedRequest
+    {
+        vm.prank(venture.getEntrepreneur());
+        venture.finalizeRequest(0);
+
+        bool actualComplete = venture.getRequestComplete(0);
+        assertEq(actualComplete, true);
+    }
+
+    function test_RequestAmountIsSentToRecipientAfterFinalization()
+        public
+        funded
+        createdRequest
+        approvedRequest
+    {
+        uint256 initialReceipientBalance = RECIPIENT.balance;
+        vm.prank(venture.getEntrepreneur());
+        venture.finalizeRequest(0);
+
+        uint256 finalReceipientBalance = RECIPIENT.balance;
+
+        assertEq(
+            finalReceipientBalance - initialReceipientBalance,
+            REQUEST_AMOUNT
+        );
+    }
 }
