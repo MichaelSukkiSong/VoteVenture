@@ -10,6 +10,7 @@ contract VentureTest is Test {
     Venture venture;
 
     address USER = makeAddr("USER");
+    address USER_WHO_DID_NOT_FUND = makeAddr("USER_WHO_DID_NOT_FUND");
     address RECIPIENT = makeAddr("RECIPIENT");
     uint256 public constant INITIAL_BALANCE = 100 ether;
     uint256 public constant FUND_AMOUNT = 10 ether;
@@ -113,8 +114,8 @@ contract VentureTest is Test {
         public
         funded
     {
-        vm.prank(venture.getEntrepreneur());
         uint256 lengthBeforeRequestCreation = venture.getRequestCount();
+        vm.prank(venture.getEntrepreneur());
         venture.createRequest(
             REQUEST_DESCRIPTION,
             REQUEST_AMOUNT,
@@ -126,7 +127,64 @@ contract VentureTest is Test {
         assertEq(lengthAfterRequestCreation - lengthBeforeRequestCreation, 1);
     }
 
+    modifier createdRequest() {
+        vm.prank(venture.getEntrepreneur());
+        venture.createRequest(
+            REQUEST_DESCRIPTION,
+            REQUEST_AMOUNT,
+            payable(RECIPIENT)
+        );
+
+        _;
+    }
+
     /* approveRequest function */
+
+    function test_MustBeFunderToApproveRequest() public funded createdRequest {
+        vm.prank(USER_WHO_DID_NOT_FUND);
+        vm.expectRevert();
+        venture.approveRequest(0);
+    }
+
+    function test_CannotApproveTwice() public funded createdRequest {
+        vm.prank(USER);
+        venture.approveRequest(0);
+
+        vm.prank(USER);
+        vm.expectRevert();
+        venture.approveRequest(0);
+    }
+
+    function test_RequestShouldBeFinalizedAfterApproval()
+        public
+        funded
+        createdRequest
+    {
+        vm.prank(USER);
+        venture.approveRequest(0);
+
+        bool actualApproval = venture.getRequestApprovals(0, USER);
+        assertEq(actualApproval, true);
+    }
+
+    function test_RequestApprovalCountShouldIncreaseAfterApproval()
+        public
+        funded
+        createdRequest
+    {
+        vm.prank(USER);
+        venture.approveRequest(0);
+
+        uint256 actualApprovalCount = venture.getRequestApprovalCount(0);
+        assertEq(actualApprovalCount, 1);
+    }
+
+    modifier approveRequest() {
+        vm.prank(USER);
+        venture.approveRequest(0);
+
+        _;
+    }
 
     /* finalizeRequest function */
 }
