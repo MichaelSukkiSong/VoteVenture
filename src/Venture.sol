@@ -117,4 +117,17 @@ contract Venture {
     function getRequestRecipient(uint256 _index) public view returns (address) {
         return requests[_index].recipient;
     }
+
+    function getRequestApprovals(
+        uint256 _index,
+        address _funder
+    ) public view returns (bool) {
+        return requests[_index].approvals[_funder];
+    }
+
+    function getRequestApprovalCount(
+        uint256 _index
+    ) public view returns (uint256) {
+        return requests[_index].approvalCount;
+    }
 }
