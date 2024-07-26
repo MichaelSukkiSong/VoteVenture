@@ -130,4 +130,8 @@ contract Venture {
     ) public view returns (uint256) {
         return requests[_index].approvalCount;
     }
+
+    function getRequestComplete(uint256 _index) public view returns (bool) {
+        return requests[_index].complete;
+    }
 }
