@@ -5,7 +5,7 @@ pragma solidity ^0.8.26;
 import {Script} from "forge-std/Script.sol";
 import {MockAggregator} from "../test/mock/MockAggregator.sol";
 
-contract NetworkConfig is Script {
+contract ConfigureConfig is Script {
     NetworkConfig public activeNetworkConfig;
 
     struct NetworkConfig {
