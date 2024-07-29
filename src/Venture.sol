@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.26;
+
+import {AggregatorV3Interface} from "chainlink-brownie-contracts/shared/interfaces/AggregatorV3Interface.sol";
 
 contract Venture {
     uint256 public constant MINIMUM_FUND = 5 * 10 ** 18;
@@ -8,6 +10,7 @@ contract Venture {
     address[] private funders;
     mapping(address funder => uint256 amount) private funderAmount;
     Request[] private requests;
+    AggregatorV3Interface private priceFeed;
 
     struct Request {
         string description;
@@ -18,12 +21,15 @@ contract Venture {
         mapping(address => bool) approvals;
     }
 
-    constructor() {
+    constructor(address priceFeedAddress) {
         i_entrepreneur = msg.sender;
+        priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
     function fund() public payable {
-        if (msg.value < MINIMUM_FUND) {
+        (, int256 answer, , , ) = priceFeed.latestRoundData();
+
+        if ((msg.value * uint256(answer * 1e10)) / 1e18 < MINIMUM_FUND) {
             revert("You need to fund more than the minimum fund");
         }
 
@@ -133,5 +139,13 @@ contract Venture {
 
     function getRequestComplete(uint256 _index) public view returns (bool) {
         return requests[_index].complete;
+    }
+
+    function getVersion() public view returns (uint256) {
+        return priceFeed.version();
+    }
+
+    function getDecimals() public view returns (uint8) {
+        return priceFeed.decimals();
     }
 }
