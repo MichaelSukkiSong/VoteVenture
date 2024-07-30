@@ -13,8 +13,8 @@ contract VentureTest is Test {
     address USER_WHO_DID_NOT_FUND = makeAddr("USER_WHO_DID_NOT_FUND");
     address RECIPIENT = makeAddr("RECIPIENT");
     uint256 public constant INITIAL_BALANCE = 100 ether;
-    uint256 public constant FUND_AMOUNT = 10 ether;
-    uint256 public constant REQUEST_AMOUNT = 5 ether;
+    uint256 public constant FUND_AMOUNT = 0.1 ether;
+    uint256 public constant REQUEST_AMOUNT = 0.01 ether;
     string public constant REQUEST_DESCRIPTION = "some description";
 
     function setUp() public {
@@ -45,7 +45,7 @@ contract VentureTest is Test {
 
     function test_FundDataStructureShouldBeUpdatedAfterFunding() public {
         vm.prank(USER);
-        venture.fund{value: 10 ether}();
+        venture.fund{value: FUND_AMOUNT}();
 
         // check funders array
         address[] memory funders = venture.getFunders();
@@ -59,7 +59,7 @@ contract VentureTest is Test {
         uint256 amount = venture.getFunderAmount(USER);
 
         assertEq(funder, USER);
-        assertEq(amount, 10 ether);
+        assertEq(amount, FUND_AMOUNT);
     }
 
     modifier funded() {
