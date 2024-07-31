@@ -27,7 +27,11 @@ contract Venture {
     }
 
     function fund() public payable {
-        (, int256 answer, , , ) = priceFeed.latestRoundData();
+        int256 answer = getPriceFeedLatestRoundData();
+
+        if (answer == 0) {
+            revert("Price feed is not available");
+        }
 
         if ((msg.value * uint256(answer * 1e10)) / 1e18 < MINIMUM_FUND) {
             revert("You need to fund more than the minimum fund");
@@ -147,5 +151,10 @@ contract Venture {
 
     function getDecimals() public view returns (uint8) {
         return priceFeed.decimals();
+    }
+
+    function getPriceFeedLatestRoundData() public view returns (int256) {
+        (, int256 answer, , , ) = priceFeed.latestRoundData();
+        return answer;
     }
 }

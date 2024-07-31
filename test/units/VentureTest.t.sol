@@ -253,4 +253,6 @@ contract VentureTest is Test {
             REQUEST_AMOUNT
         );
     }
+
+    // TODO: configure config test
 }
