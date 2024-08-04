@@ -4,13 +4,33 @@ pragma solidity ^0.8.26;
 
 import {AggregatorV3Interface} from "chainlink-brownie-contracts/shared/interfaces/AggregatorV3Interface.sol";
 
+contract VentureFactory {
+    address[] private s_deployedVentures;
+    address s_priceFeedAddress;
+
+    constructor(address _priceFeedAddress) {
+        s_priceFeedAddress = _priceFeedAddress;
+    }
+
+    function createVenture() public returns (Venture) {
+        Venture newVenture = new Venture(s_priceFeedAddress, msg.sender);
+        s_deployedVentures.push(address(newVenture));
+
+        return newVenture;
+    }
+
+    function getDeployedVentures() public view returns (address[] memory) {
+        return s_deployedVentures;
+    }
+}
+
 contract Venture {
     uint256 public constant MINIMUM_FUND = 5 * 10 ** 18;
     address private immutable i_entrepreneur;
-    address[] private funders;
-    mapping(address funder => uint256 amount) private funderAmount;
-    Request[] private requests;
-    AggregatorV3Interface private priceFeed;
+    address[] private s_funders;
+    mapping(address funder => uint256 amount) private s_funderAmount;
+    Request[] private s_requests;
+    AggregatorV3Interface private s_priceFeed;
 
     struct Request {
         string description;
@@ -21,9 +41,9 @@ contract Venture {
         mapping(address => bool) approvals;
     }
 
-    constructor(address priceFeedAddress) {
-        i_entrepreneur = msg.sender;
-        priceFeed = AggregatorV3Interface(priceFeedAddress);
+    constructor(address priceFeedAddress, address _entrepreneur) {
+        i_entrepreneur = _entrepreneur;
+        s_priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
     function fund() public payable {
@@ -37,8 +57,8 @@ contract Venture {
             revert("You need to fund more than the minimum fund");
         }
 
-        funders.push(msg.sender);
-        funderAmount[msg.sender] += msg.value;
+        s_funders.push(msg.sender);
+        s_funderAmount[msg.sender] += msg.value;
     }
 
     modifier onlyEntrepreneur() {
@@ -56,7 +76,7 @@ contract Venture {
             "Amount should be less than the total fund"
         );
 
-        Request storage newRequest = requests.push();
+        Request storage newRequest = s_requests.push();
         newRequest.description = description;
         newRequest.amount = amount;
         newRequest.recipient = recipient;
@@ -65,9 +85,9 @@ contract Venture {
     }
 
     function approveRequest(uint256 _index) public {
-        Request storage request = requests[_index];
+        Request storage request = s_requests[_index];
 
-        require(funderAmount[msg.sender] > 0, "You are not a funder");
+        require(s_funderAmount[msg.sender] > 0, "You are not a funder");
         require(!request.approvals[msg.sender], "You have already approved");
 
         request.approvals[msg.sender] = true;
@@ -75,10 +95,10 @@ contract Venture {
     }
 
     function finalizeRequest(uint256 _index) public {
-        Request storage request = requests[_index];
+        Request storage request = s_requests[_index];
 
         require(
-            request.approvalCount > (funders.length / 2),
+            request.approvalCount > (s_funders.length / 2),
             "Not enough approvals"
         );
         require(!request.complete, "Request already completed");
@@ -99,62 +119,62 @@ contract Venture {
     }
 
     function getFunders() public view returns (address[] memory) {
-        return funders;
+        return s_funders;
     }
 
     function getFunder(uint256 _index) public view returns (address) {
-        return funders[_index];
+        return s_funders[_index];
     }
 
     function getFunderAmount(address _funder) public view returns (uint256) {
-        return funderAmount[_funder];
+        return s_funderAmount[_funder];
     }
 
     function getRequestCount() public view returns (uint256) {
-        return requests.length;
+        return s_requests.length;
     }
 
     function getRequestDescription(
         uint256 _index
     ) public view returns (string memory) {
-        return requests[_index].description;
+        return s_requests[_index].description;
     }
 
     function getRequestAmount(uint256 _index) public view returns (uint256) {
-        return requests[_index].amount;
+        return s_requests[_index].amount;
     }
 
     function getRequestRecipient(uint256 _index) public view returns (address) {
-        return requests[_index].recipient;
+        return s_requests[_index].recipient;
     }
 
     function getRequestApprovals(
         uint256 _index,
         address _funder
     ) public view returns (bool) {
-        return requests[_index].approvals[_funder];
+        return s_requests[_index].approvals[_funder];
     }
 
     function getRequestApprovalCount(
         uint256 _index
     ) public view returns (uint256) {
-        return requests[_index].approvalCount;
+        return s_requests[_index].approvalCount;
     }
 
     function getRequestComplete(uint256 _index) public view returns (bool) {
-        return requests[_index].complete;
+        return s_requests[_index].complete;
     }
 
     function getVersion() public view returns (uint256) {
-        return priceFeed.version();
+        return s_priceFeed.version();
     }
 
     function getDecimals() public view returns (uint8) {
-        return priceFeed.decimals();
+        return s_priceFeed.decimals();
     }
 
     function getPriceFeedLatestRoundData() public view returns (int256) {
-        (, int256 answer, , , ) = priceFeed.latestRoundData();
+        (, int256 answer, , , ) = s_priceFeed.latestRoundData();
         return answer;
     }
 }
