@@ -3,13 +3,15 @@
 pragma solidity ^0.8.26;
 
 import {Test, console} from "forge-std/Test.sol";
-import {DeployVenture} from "../../script/DeployVenture.s.sol";
-import {Venture} from "../../src/Venture.sol";
+import {DeployVentureFactory} from "../../script/DeployVentureFactory.s.sol";
+import {Venture, VentureFactory} from "../../src/Venture.sol";
 
 contract VentureTest is Test {
+    VentureFactory ventureFactory;
     Venture venture;
 
     address USER = makeAddr("USER");
+    address ANOTHER_USER = makeAddr("ANOTHER_USER");
     address USER_WHO_DID_NOT_FUND = makeAddr("USER_WHO_DID_NOT_FUND");
     address RECIPIENT = makeAddr("RECIPIENT");
     uint256 public constant INITIAL_BALANCE = 100 ether;
@@ -18,8 +20,10 @@ contract VentureTest is Test {
     string public constant REQUEST_DESCRIPTION = "some description";
 
     function setUp() public {
-        DeployVenture deployer = new DeployVenture();
-        venture = deployer.run();
+        DeployVentureFactory ventureFactorydeployer = new DeployVentureFactory();
+        ventureFactory = ventureFactorydeployer.run();
+        vm.prank(USER);
+        venture = ventureFactory.createVenture();
         vm.deal(USER, INITIAL_BALANCE);
     }
 
@@ -32,7 +36,7 @@ contract VentureTest is Test {
     function test_EntrepreneurIsSetToOwner() public view {
         address actual = venture.getEntrepreneur();
 
-        assertEq(actual, msg.sender);
+        assertEq(actual, USER);
     }
 
     /* fund function */
@@ -71,7 +75,7 @@ contract VentureTest is Test {
     /* createRequest function */
 
     function test_OnlyEntrepreneurCanCreateRequest() public funded {
-        vm.prank(USER);
+        vm.prank(ANOTHER_USER);
         vm.expectRevert();
         venture.createRequest(
             REQUEST_DESCRIPTION,
@@ -253,6 +257,4 @@ contract VentureTest is Test {
             REQUEST_AMOUNT
         );
     }
-
-    // TODO: configure config test
 }
