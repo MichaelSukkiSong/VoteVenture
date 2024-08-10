@@ -4,24 +4,40 @@ pragma solidity ^0.8.26;
 
 import {Script, console} from "forge-std/Script.sol";
 import {DevOpsTools} from "foundry-devops/DevOpsTools.sol";
-import {Venture} from "../src/Venture.sol";
+import {Venture, VentureFactory} from "../src/Venture.sol";
+
+contract CreateVenture is Script {
+    function createVenture(address mostRecentlyDeployed) public {
+        vm.startBroadcast();
+        VentureFactory(mostRecentlyDeployed).createVenture();
+        vm.stopBroadcast();
+        console.log("Created a new Venture");
+    }
+
+    function run() external {
+        address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
+            "VentureFactory",
+            block.chainid
+        );
+
+        createVenture(mostRecentlyDeployed);
+    }
+}
 
 contract FundVenture is Script {
     uint256 public constant FUND_AMOUNT = 0.01 ether;
 
-    // address USER = makeAddr("USER");
-    // address RECIPIENT = makeAddr("RECIPIENT");
-
     function fundVenture(address mostRecentlyDeployed) public {
         vm.startBroadcast();
-        Venture(payable(mostRecentlyDeployed)).fund{value: FUND_AMOUNT}();
+        Venture(VentureFactory(mostRecentlyDeployed).getDeployedVentures()[0])
+            .fund{value: FUND_AMOUNT}();
         vm.stopBroadcast();
         console.log("Funded this Venture with %s", FUND_AMOUNT);
     }
 
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
-            "Venture",
+            "VentureFactory",
             block.chainid
         );
 
@@ -36,11 +52,12 @@ contract CreateRequestVenture is Script {
 
     function createRequestVenture(address mostRecentlyDeployed) public {
         vm.startBroadcast();
-        Venture(payable(mostRecentlyDeployed)).createRequest(
-            REQUEST_DESCRIPTION,
-            REQUEST_AMOUNT,
-            payable(RECIPIENT)
-        );
+        Venture(VentureFactory(mostRecentlyDeployed).getDeployedVentures()[0])
+            .createRequest(
+                REQUEST_DESCRIPTION,
+                REQUEST_AMOUNT,
+                payable(RECIPIENT)
+            );
         vm.stopBroadcast();
         console.log(
             "Created a request to %s and pay %s to %s",
@@ -52,7 +69,7 @@ contract CreateRequestVenture is Script {
 
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
-            "Venture",
+            "VentureFactory",
             block.chainid
         );
 
@@ -63,14 +80,15 @@ contract CreateRequestVenture is Script {
 contract ApproveRequestVenture is Script {
     function approveRequestVenture(address mostRecentlyDeployed) public {
         vm.startBroadcast();
-        Venture(payable(mostRecentlyDeployed)).approveRequest(0);
+        Venture(VentureFactory(mostRecentlyDeployed).getDeployedVentures()[0])
+            .approveRequest(0);
         vm.stopBroadcast();
         console.log("Approved the request");
     }
 
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
-            "Venture",
+            "VentureFactory",
             block.chainid
         );
 
@@ -81,14 +99,15 @@ contract ApproveRequestVenture is Script {
 contract FinalizeRequestVenture is Script {
     function finalizeRequestVenture(address mostRecentlyDeployed) public {
         vm.startBroadcast();
-        Venture(payable(mostRecentlyDeployed)).finalizeRequest(0);
+        Venture(VentureFactory(mostRecentlyDeployed).getDeployedVentures()[0])
+            .finalizeRequest(0);
         vm.stopBroadcast();
         console.log("Finalized the request");
     }
 
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
-            "Venture",
+            "VentureFactory",
             block.chainid
         );
 
