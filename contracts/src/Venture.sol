@@ -118,6 +118,8 @@ contract Venture {
         return i_entrepreneur;
     }
 
+    /* funder getters */
+
     function getFunders() public view returns (address[] memory) {
         return s_funders;
     }
@@ -129,6 +131,8 @@ contract Venture {
     function getFunderAmount(address _funder) public view returns (uint256) {
         return s_funderAmount[_funder];
     }
+
+    /* request getters */
 
     function getRequestCount() public view returns (uint256) {
         return s_requests.length;
@@ -164,6 +168,8 @@ contract Venture {
     function getRequestComplete(uint256 _index) public view returns (bool) {
         return s_requests[_index].complete;
     }
+
+    /* price feed getters */
 
     function getVersion() public view returns (uint256) {
         return s_priceFeed.version();
