@@ -154,6 +154,19 @@ export const ventureABI = [
   },
   {
     type: "function",
+    name: "getVentureSummary",
+    inputs: [],
+    outputs: [
+      { name: "", type: "uint256", internalType: "uint256" },
+      { name: "", type: "uint256", internalType: "uint256" },
+      { name: "", type: "uint256", internalType: "uint256" },
+      { name: "", type: "uint256", internalType: "uint256" },
+      { name: "", type: "address", internalType: "address" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getVersion",
     inputs: [],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],

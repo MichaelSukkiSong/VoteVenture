@@ -183,4 +183,20 @@ contract Venture {
         (, int256 answer, , , ) = s_priceFeed.latestRoundData();
         return answer;
     }
+
+    /* summary getters */
+
+    function getVentureSummary()
+        public
+        view
+        returns (uint256, uint256, uint256, uint256, address)
+    {
+        return (
+            address(this).balance,
+            MINIMUM_FUND,
+            s_requests.length,
+            s_funders.length,
+            i_entrepreneur
+        );
+    }
 }
