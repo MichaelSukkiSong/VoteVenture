@@ -66,6 +66,22 @@ contract VentureTest is Test {
         assertEq(amount, FUND_AMOUNT);
     }
 
+    function test_FundersDataStructureShouldNotIncreaseWhenFundedByTheSameFunder()
+        public
+    {
+        vm.prank(USER);
+        venture.fund{value: FUND_AMOUNT}();
+
+        uint256 lengthBeforeFunding = venture.getFunders().length;
+
+        vm.prank(USER);
+        venture.fund{value: FUND_AMOUNT}();
+
+        uint256 lengthAfterFunding = venture.getFunders().length;
+
+        assertEq(lengthAfterFunding, lengthBeforeFunding);
+    }
+
     modifier funded() {
         vm.prank(USER);
         venture.fund{value: FUND_AMOUNT}();

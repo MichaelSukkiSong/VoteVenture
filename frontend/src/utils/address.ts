@@ -1,2 +1,2 @@
 export const ventureFactoryAddress =
-  "0xc8bacdeb6b23d62736a664efdf3d39c7c6bbdd29";
+  "0xe277348308a3e0af4cc22a3b9b75555f7f107727";

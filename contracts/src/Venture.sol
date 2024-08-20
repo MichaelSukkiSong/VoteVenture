@@ -57,7 +57,9 @@ contract Venture {
             revert("You need to fund more than the minimum fund");
         }
 
-        s_funders.push(msg.sender);
+        if (s_funderAmount[msg.sender] == 0) {
+            s_funders.push(msg.sender);
+        }
         s_funderAmount[msg.sender] += msg.value;
     }
 
