@@ -2,6 +2,10 @@
 
 **VoteVenture** is a dApp that helps entrepreneurs turn their ideas into ventures, with the community's help. It's all about transparency—users can fund ventures, and those funds are managed fairly through the power of smart contracts on the blockchain.
 
+![UI Screenshot 1](image/VoteVenture_1.png)
+![UI Screenshot 2](image/VoteVenture_2.png)
+![UI Screenshot 2](image/VoteVenture_3.png)
+
 ## How It Works
 
 - **Create Ventures:** Entrepreneurs can start a venture, sharing their business idea and seeking funding from others.
