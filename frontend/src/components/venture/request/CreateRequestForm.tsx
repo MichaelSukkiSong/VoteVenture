@@ -43,6 +43,33 @@ const CreateRequestForm = () => {
 
   const handleCreate = () => {
     console.log("Creating Request...");
+
+    if (signer) {
+      async function createRequest() {
+        setIsLoading(true);
+
+        try {
+          const ventureContract = new ethers.Contract(
+            ventureContractAddress,
+            ventureABI,
+            signer
+          );
+
+          await ventureContract.createRequest(
+            inputValue.description,
+            ethers.utils.parseEther(inputValue.amount),
+            ethers.utils.getAddress(inputValue.recipient)
+          );
+
+          router.push(`/ventures/${ventureContractAddress}/requests`);
+        } catch (e) {
+          console.log(e);
+        }
+        setIsLoading(false);
+      }
+
+      createRequest();
+    }
   };
 
   return (
