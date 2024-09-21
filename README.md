@@ -1,6 +1,6 @@
 # VoteVenture
 
-**VoteVenture** is a dApp that helps entrepreneurs turn their ideas into ventures, with the community's help. It's all about transparency—users can fund ventures, and those funds are managed fairly through the power of smart contracts on the blockchain.
+**VoteVenture** is a dApp that helps entrepreneurs bring their ideas to life with support from the community. Users can fund ventures, and all funds are managed transparently through smart contracts on the blockchain.
 
 ![UI Screenshot 1](image/VoteVenture_1.png)
 ![UI Screenshot 2](image/VoteVenture_2.png)
@@ -31,7 +31,7 @@
 
 ## Development & Testing
 
-We’ve put the smart contracts through the wringer with both unit and integration tests, so they’re solid and ready to go.
+The project utilizes unit and integration tests to ensure the reliability of the smart contracts. The primary objective of this project is to serve as a practical learning experience, enabling me to enhance my development skills in the areas of Solidity.
 
 ## Setup and Installation
 
